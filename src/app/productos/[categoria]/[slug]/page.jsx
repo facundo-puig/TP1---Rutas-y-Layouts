@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import EnvioModal from "@/app/components/EnvioModal";
+import AgregarAlCarrito from "@/app/components/AgregarAlCarrito";
 
 export default async function ProductoPage({ params }) {
     const { categoria, slug } = await params;
@@ -89,9 +90,14 @@ export default async function ProductoPage({ params }) {
                         </div>
                     </div>
 
-                    <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg cursor-pointer transition">
-                        Comprar
-                    </button>
+                    <AgregarAlCarrito producto={{
+                        id: producto.id,
+                        nombre: producto.nombre,
+                        precio: producto.precio,
+                        imagen: producto.imagen,
+                        slug: producto.slug,
+                        categoria: producto.categoria,
+                    }} />
 
                 </div>
             </div>
