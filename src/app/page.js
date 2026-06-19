@@ -1,11 +1,25 @@
 import Link from "next/link";
 import Image from "next/image";
-import { productos } from "@/lib/productos";
 
-// Destacados por id
-const destacados = productos.filter(p => p.destacado);
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
-export default function Home() {
+async function getDestacados() {
+  const categorias = ["placas-de-video", "microprocesadores"];
+
+  const resultados = await Promise.all(
+    categorias.map((cat) =>
+      fetch(`${BASE_URL}/api/scraper?categoria=${cat}`, {
+        next: { revalidate: 3600 },
+      }).then((res) => res.json())
+    )
+  );
+
+  return resultados.flatMap((items) => items.slice(0, 3));
+}
+
+export default async function Home() {
+  const destacados = await getDestacados();
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 text-center">
       <div className="w-full rounded-2xl overflow-hidden">
@@ -41,7 +55,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
             {destacados.map((p) => (
               <Link
-                key={p.id}
+                key={p.slug}
                 href={`/productos/${p.categoria}/${p.slug}`}
                 className="bg-zinc-800 border border-zinc-700 rounded-xl p-5 hover:border-purple-500 transition"
               >

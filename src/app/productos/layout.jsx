@@ -10,8 +10,8 @@ const categorias = [
     ]
   },
   {
-    nombre: "Procesadores",
-    slug: "procesadores",
+    nombre: "Microprocesadores",
+    slug: "microprocesadores",
     subcategorias: [
       { nombre: "AMD", slug: "amd" },
       { nombre: "Intel", slug: "intel" },

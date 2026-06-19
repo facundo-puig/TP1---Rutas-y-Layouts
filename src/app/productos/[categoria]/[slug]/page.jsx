@@ -1,15 +1,23 @@
-import { productos } from "@/lib/productos";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import EnvioModal from "@/app/components/EnvioModal";
 import AgregarAlCarrito from "@/app/components/AgregarAlCarrito";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 export default async function ProductoPage({ params }) {
     const { categoria, slug } = await params;
 
+    const res = await fetch(
+        `${BASE_URL}/api/scraper?categoria=${categoria}`,
+        { next: { revalidate: 3600 } }
+    );
+
+    const productos = await res.json();
+
     const producto = productos.find(
-        (p) => p.categoria === categoria && p.slug === slug
+        p => p.slug === slug
     );
 
     if (!producto) return notFound();

@@ -1,14 +1,37 @@
 import Link from "next/link";
 import Image from "next/image";
-import { productos } from "@/lib/productos";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const categoriasHG = ["placas-de-video", "microprocesadores", "memorias-ram", "almacenamiento"];
 
 export default async function CategoriaPage({ params, searchParams }) {
   const { categoria } = await params;
   const { marca } = await searchParams;
 
-  const items = productos.filter(p =>
-    p.categoria === categoria && (marca ? p.marca === marca : true)
-  );
+  let items = [];
+
+  if (categoriasHG.includes(categoria)) {
+    const res = await fetch(
+      `${BASE_URL}/api/scraper?categoria=${categoria}`,
+      { next: { revalidate: 3600 } }
+    );
+    items = await res.json();
+
+    const marcaKeywords = {
+      "nvidia": ["nvidia", "geforce", "rtx", "gtx"],
+      "amd": ["amd", "radeon", "rx", "ryzen"],
+      "intel": ["intel", "core"],
+    };
+
+    if (marca) {
+      const keywords = marcaKeywords[marca.toLowerCase()] || [marca];
+      items = items.filter(p =>
+        keywords.some(kw =>
+          p.nombre.toLowerCase().includes(kw.toLowerCase())
+        )
+      );
+    }
+  }
 
   return (
     <main className="max-w-6xl mx-auto p-6">
@@ -22,7 +45,14 @@ export default async function CategoriaPage({ params, searchParams }) {
           >
             {p.imagen && (
               <div className="w-40 h-40 relative shrink-0">
-                <Image src={p.imagen} alt={p.nombre} fill sizes="160px" className="object-contain" />
+                <Image
+                  src={p.imagen}
+                  alt={p.nombre}
+                  fill
+                  sizes="160px"
+                  className="object-contain"
+                // unoptimized={categoriasHG.includes(categoria)}
+                />
               </div>
             )}
             <div className="text-center w-full">

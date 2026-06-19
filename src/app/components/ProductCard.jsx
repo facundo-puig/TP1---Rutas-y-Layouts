@@ -21,7 +21,7 @@ export default function ProductCard({ producto }) {
 
             <div className="text-center w-full">
                 <p className="text-xs text-purple-400 mb-1 capitalize">
-                    {producto.categoria.replace(/-/g, " ")}
+                    {producto.categoria?.replace(/-/g, " ") || "destacados"}
                 </p>
 
                 <h2 className="text-zinc-100 text-base font-medium">
